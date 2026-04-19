@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AstraVerse</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body{margin:0;font-family:'Orbitron',sans-serif;background:#0a0a0f;color:white}
+
+/* NAVBAR */
+nav{display:flex;justify-content:space-between;align-items:center;padding:15px 40px;background:#0a0a0f;border-bottom:1px solid #1f1f2e}
+.logo{font-size:1.5rem;color:#6cf;letter-spacing:1px}
+nav a{color:#aaa;margin-left:20px;text-decoration:none}
+nav a:hover{color:#6cf}
+
+/* HERO */
+.hero{padding:100px 20px;text-align:center}
+.hero h1{font-size:3.5rem;background:linear-gradient(90deg,#6cf,#a855f7);-webkit-background-clip:text;color:transparent}
+.hero p{color:#aaa;margin-top:10px}
+
+.btn{margin-top:20px;padding:12px 28px;border-radius:30px;border:none;background:linear-gradient(90deg,#6cf,#a855f7);color:white;cursor:pointer}
+
+/* GRID SECTION */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;padding:40px}
+.card{background:#111;border-radius:15px;padding:20px;box-shadow:0 0 10px rgba(0,255,255,0.1);transition:0.3s}
+.card:hover{transform:translateY(-10px);box-shadow:0 0 20px rgba(0,255,255,0.3)}
+
+/* GAME */
+#gameCanvas{display:block;margin:20px auto;background:#000;border:1px solid #6cf;border-radius:10px}
+
+footer{text-align:center;padding:30px;color:#666}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo">⚡ AstraVerse</div>
+<div>
+<a href="#">Home</a>
+<a href="#games">Games</a>
+<a href="#features">Features</a>
+</div>
+</nav>
+
+<section class="hero">
+<h1>AstraVerse</h1>
+<p>Where Focus Meets Power</p>
+<button class="btn" onclick="scrollToGames()">Explore Games</button>
+</section>
+
+<section id="features" class="grid">
+<div class="card">
+<h3>⚡ Fast Gameplay</h3>
+<p>Train your reflexes with smooth and fast games.</p>
+</div>
+<div class="card">
+<h3>🧠 Focus Training</h3>
+<p>Improve concentration with interactive challenges.</p>
+</div>
+<div class="card">
+<h3>🏆 Compete</h3>
+<p>Beat high scores and climb leaderboard.</p>
+</div>
+</section>
+
+<section id="games" class="grid">
+<div class="card">
+<h3>Dodge Game</h3>
+<button class="btn" onclick="startGame()">Play</button>
+</div>
+</section>
+
+<canvas id="gameCanvas" width="400" height="500"></canvas>
+<p id="score" style="text-align:center"></p>
+
+<footer>
+© 2026 AstraVerse
+</footer>
+
+<script>
+function scrollToGames(){document.getElementById('games').scrollIntoView({behavior:'smooth'})}
+
+const canvas=document.getElementById('gameCanvas');
+const ctx=canvas.getContext('2d');
+let player={x:180,y:450};
+let obstacles=[];let running=false;let score=0;
+
+function startGame(){running=true;score=0;obstacles=[];loop()}
+
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowLeft')player.x-=30;
+if(e.key==='ArrowRight')player.x+=30;
+});
+
+function spawn(){obstacles.push({x:Math.random()*380,y:0})}
+
+function update(){
+if(Math.random()<0.05)spawn();
+obstacles.forEach(o=>{
+o.y+=4;
+if(o.x<player.x+20&&o.x+20>player.x&&o.y<player.y+20&&o.y+20>player.y){running=false;alert('Game Over Score: '+score)}
+});
+obstacles=obstacles.filter(o=>o.y<500);
+score++;
+document.getElementById('score').innerText='Score: '+score;
+}
+
+function draw(){
+ctx.clearRect(0,0,400,500);
+ctx.fillStyle='#6cf';ctx.fillRect(player.x,player.y,20,20);
+ctx.fillStyle='red';obstacles.forEach(o=>ctx.fillRect(o.x,o.y,20,20));
+}
+
+function loop(){if(!running)return;update();draw();requestAnimationFrame(loop)}
+</script>
+
+</body>
+</html>
+
+
