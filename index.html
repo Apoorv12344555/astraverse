@@ -5,20 +5,73 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AstraVerse Pro</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<!-- 🔤 FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+
+<!-- 🖼️ FAVICON -->
+<link rel="icon" type="image/png" href="logo.png">
+
+<!-- 🔥 SHARE PREVIEW -->
+<meta property="og:title" content="AstraVerse Pro">
+<meta property="og:description" content="Play futuristic web games">
+<meta property="og:image" content="logo.png">
 
 <style>
-body{margin:0;font-family:'Orbitron',sans-serif;background:#0a0a0f;color:white;text-align:center}
+body{
+  margin:0;
+  font-family:'Poppins',sans-serif;
+  background:#0a0a0f;
+  color:white;
+  text-align:center;
+}
 
-nav{display:flex;justify-content:space-between;padding:15px 30px;background:#0a0a0f}
-.logo{color:#6cf;font-size:1.5rem}
+/* NAVBAR */
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:15px 30px;
+}
 
-.btn{padding:10px 20px;margin:10px;border:none;border-radius:20px;background:linear-gradient(90deg,#6cf,#a855f7);color:white;cursor:pointer}
+.logo{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.6rem;
+  color:#6cf;
+  text-shadow:0 0 10px #6cf,0 0 20px #6cf;
+}
 
-canvas{background:#000;border:1px solid #6cf;border-radius:10px;margin-top:20px}
+/* HEADINGS */
+h1,h2,h3{
+  font-family:'Rajdhani',sans-serif;
+}
 
+/* BUTTON */
+.btn{
+  padding:10px 20px;
+  margin:10px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(90deg,#6cf,#a855f7);
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+}
+.btn:hover{
+  transform:scale(1.1);
+}
+
+/* CANVAS */
+canvas{
+  background:#000;
+  border:1px solid #6cf;
+  border-radius:10px;
+  margin-top:20px;
+  box-shadow:0 0 20px #6cf;
+}
+
+/* GAME SECTIONS */
 .game{display:none}
 .active{display:block}
+
 </style>
 </head>
 
@@ -31,22 +84,13 @@ canvas{background:#000;border:1px solid #6cf;border-radius:10px;margin-top:20px}
 <h1>AstraVerse Pro</h1>
 
 <button class="btn" onclick="showGame('dodge')">Play Neon Dodge</button>
-<button class="btn" onclick="showGame('tap')">Play Tap Game</button>
 
-<!-- DODGE GAME -->
-<div id="dodge" class="game">
+<!-- GAME -->
+<div id="dodge" class="game active">
 <h2>Neon Dodge</h2>
-<canvas id="dodgeCanvas" width="400" height="500"></canvas>
-<p id="dodgeScore"></p>
-<button class="btn" onclick="startDodge()">Start</button>
-</div>
-
-<!-- TAP GAME -->
-<div id="tap" class="game">
-<h2>Tap Speed Game</h2>
-<p id="tapScore">Score: 0</p>
-<button class="btn" onclick="tap()">Tap Me!</button>
-<button class="btn" onclick="startTap()">Start</button>
+<canvas id="gameCanvas" width="400" height="500"></canvas>
+<p id="score"></p>
+<button class="btn" onclick="startGame()">Start Game</button>
 </div>
 
 <script>
@@ -57,43 +101,50 @@ function showGame(id){
   document.getElementById(id).classList.add('active');
 }
 
-/* =======================
-   🎮 DODGE GAME
-======================= */
+/* =====================
+   🎮 NEON DODGE GAME
+===================== */
 
-const canvas = document.getElementById("dodgeCanvas");
-const ctx = canvas.getContext("2d");
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
 let player, obstacles, running, score;
 
-function resetDodge(){
+// RESET
+function resetGame(){
   player = {x:180,y:450,size:20};
   obstacles = [];
   score = 0;
 }
 
-function startDodge(){
-  resetDodge();
+// START
+function startGame(){
+  resetGame();
   running = true;
+  document.getElementById("score").innerText="Game Started!";
 }
 
-document.addEventListener("keydown", e=>{
+// CONTROLS
+document.addEventListener('keydown', e=>{
   if(!running) return;
+
   if(e.key==="ArrowLeft" && player.x>0) player.x-=15;
   if(e.key==="ArrowRight" && player.x<380) player.x+=15;
 });
 
+// SPAWN
 function spawn(){
   obstacles.push({x:Math.random()*380,y:0,size:20});
 }
 
-function updateDodge(){
+// UPDATE
+function update(){
   if(!running) return;
 
   if(Math.random()<0.05) spawn();
 
   for(let o of obstacles){
-    o.y+=4;
+    o.y += 4;
 
     if(
       o.x < player.x + player.size &&
@@ -101,77 +152,44 @@ function updateDodge(){
       o.y < player.y + player.size &&
       o.y + o.size > player.y
     ){
-      running=false;
-      document.getElementById("dodgeScore").innerText =
-        "Game Over! Score: " + score;
+      running = false;
+      document.getElementById("score").innerText =
+        "💀 Game Over! Score: " + score;
       return;
     }
   }
 
-  obstacles = obstacles.filter(o=>o.y<500);
+  obstacles = obstacles.filter(o=>o.y < 500);
   score++;
-  document.getElementById("dodgeScore").innerText = "Score: "+score;
+  document.getElementById("score").innerText = "Score: " + score;
 }
 
-function drawDodge(){
+// DRAW
+function draw(){
   ctx.clearRect(0,0,400,500);
 
+  // player
   ctx.fillStyle="#6cf";
   ctx.fillRect(player.x,player.y,20,20);
 
+  // obstacles
   ctx.fillStyle="red";
-  obstacles.forEach(o=>ctx.fillRect(o.x,o.y,20,20));
+  obstacles.forEach(o=>{
+    ctx.fillRect(o.x,o.y,20,20);
+  });
 }
 
-/* =======================
-   🎮 TAP GAME
-======================= */
-
-let tapScore=0;
-let tapRunning=false;
-let time=10;
-
-function startTap(){
-  tapScore=0;
-  time=10;
-  tapRunning=true;
-  document.getElementById("tapScore").innerText="Time: 10 | Score: 0";
-
-  let timer=setInterval(()=>{
-    time--;
-    document.getElementById("tapScore").innerText="Time: "+time+" | Score: "+tapScore;
-
-    if(time<=0){
-      clearInterval(timer);
-      tapRunning=false;
-      document.getElementById("tapScore").innerText="Game Over! Score: "+tapScore;
-    }
-  },1000);
-}
-
-function tap(){
-  if(tapRunning){
-    tapScore++;
-  }
-}
-
-/* =======================
-   🔁 MAIN LOOP
-======================= */
-
+// LOOP
 function loop(){
-  updateDodge();
-  drawDodge();
+  update();
+  draw();
   requestAnimationFrame(loop);
 }
 
-resetDodge();
+resetGame();
 loop();
 
 </script>
 
 </body>
 </html>
-
-
-
