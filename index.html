@@ -87,11 +87,17 @@ const ctx=canvas.getContext('2d');
 let player={x:180,y:450};
 let obstacles=[];let running=false;let score=0;
 
-function startGame(){running=true;score=0;obstacles=[];loop()}
+function startGame(){
+  running = true;
+  score = 0;
+  obstacles = [];
+  player.x = 180;
+  loop();
+}
 
 document.addEventListener('keydown',e=>{
-if(e.key==='ArrowLeft')player.x-=30;
-if(e.key==='ArrowRight')player.x+=30;
+if(e.key==="ArrowLeft" && player.x > 0) player.x -= 15;
+if(e.key==="ArrowRight" && player.x < 380) player.x += 15;
 });
 
 function spawn(){obstacles.push({x:Math.random()*380,y:0})}
@@ -100,7 +106,16 @@ function update(){
 if(Math.random()<0.05)spawn();
 obstacles.forEach(o=>{
 o.y+=4;
-if(o.x<player.x+20&&o.x+20>player.x&&o.y<player.y+20&&o.y+20>player.y){running=false;alert('Game Over Score: '+score)}
+if(
+  o.x < player.x + 20 &&
+  o.x + 20 > player.x &&
+  o.y < player.y + 20 &&
+  o.y + 20 > player.y
+)running = false;
+
+setTimeout(() => {
+  alert("Game Over! Score: " + score);
+}, 100);
 });
 obstacles=obstacles.filter(o=>o.y<500);
 score++;
@@ -113,7 +128,12 @@ ctx.fillStyle='#6cf';ctx.fillRect(player.x,player.y,20,20);
 ctx.fillStyle='red';obstacles.forEach(o=>ctx.fillRect(o.x,o.y,20,20));
 }
 
-function loop(){if(!running)return;update();draw();requestAnimationFrame(loop)}
+function loop(){
+  if(!running) return;
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
 </script>
 
 </body>
