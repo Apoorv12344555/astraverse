@@ -23,16 +23,6 @@ body{
   margin:20px;
 }
 
-.btn{
-  padding:10px 20px;
-  margin:10px;
-  border:none;
-  border-radius:20px;
-  background:linear-gradient(90deg,#6cf,#a855f7);
-  color:white;
-  cursor:pointer;
-}
-
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -46,14 +36,30 @@ body{
   border-radius:15px;
 }
 
+.btn{
+  padding:10px 20px;
+  margin:10px;
+  border:none;
+  border-radius:20px;
+  background:linear-gradient(90deg,#6cf,#a855f7);
+  color:white;
+  cursor:pointer;
+}
+
 .game{display:none}
 .active{display:block}
+
+canvas{
+  background:#000;
+  border:1px solid #6cf;
+  margin-top:20px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="logo"> AstraVerse Pro</div>
+<div class="logo">⚡ AstraVerse Pro</div>
 
 <h1>Choose a Game</h1>
 
@@ -69,11 +75,21 @@ body{
 <button class="btn" onclick="showGame('memoryGame')">Play</button>
 </div>
 
+<div class="card">
+<h3>🧱 Brick Breaker</h3>
+<button class="btn" onclick="showGame('brickGame')">Play</button>
+</div>
+
+<div class="card">
+<h3>⚡ Reaction Game</h3>
+<button class="btn" onclick="showGame('reactionGame')">Play</button>
+</div>
+
 </div>
 
 <!-- CLICK GAME -->
 <div id="clickGame" class="game">
-<h2>Click Target Game</h2>
+<h2>Click Target</h2>
 <p id="clickScore">Score: 0</p>
 <button class="btn" onclick="startClick()">Start</button>
 <br>
@@ -83,40 +99,49 @@ body{
 <!-- MEMORY GAME -->
 <div id="memoryGame" class="game">
 <h2>Memory Game</h2>
-<p id="memoryStatus">Click Start</p>
 <button class="btn" onclick="startMemory()">Start</button>
 <div id="memoryBoard"></div>
 </div>
 
+<!-- BRICK GAME -->
+<div id="brickGame" class="game">
+<h2>Brick Breaker</h2>
+<canvas id="brickCanvas" width="400" height="400"></canvas>
+<p id="brickScore"></p>
+<button class="btn" onclick="startBrick()">Start</button>
+</div>
+
+<!-- REACTION GAME -->
+<div id="reactionGame" class="game">
+<h2>Reaction Game</h2>
+<p id="reactionText">Click Start</p>
+<button class="btn" onclick="startReaction()">Start</button>
+</div>
+
 <script>
 
-// SWITCH GAME
+// SWITCH
 function showGame(id){
   document.querySelectorAll('.game').forEach(g=>g.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-/* 🎯 CLICK TARGET GAME */
-
-let clickScore=0;
-let clickRunning=false;
+/* CLICK GAME */
+let clickScore=0, clickRunning=false;
 
 function startClick(){
   clickScore=0;
   clickRunning=true;
-  document.getElementById("clickScore").innerText="Score: 0";
   document.getElementById("target").style.display="inline-block";
   moveTarget();
 }
 
 function moveTarget(){
   if(!clickRunning) return;
-
   let btn=document.getElementById("target");
   btn.style.position="absolute";
   btn.style.left=Math.random()*80+"%";
   btn.style.top=Math.random()*80+"%";
-
   setTimeout(moveTarget,1000);
 }
 
@@ -127,29 +152,26 @@ function hitTarget(){
   }
 }
 
-/* 🧠 MEMORY GAME */
-
-let cards = [];
-let flipped = [];
+/* MEMORY GAME */
+let cards=[], flipped=[];
 
 function startMemory(){
-  const emojis = ["🔥","🔥","⚡","⚡","🎮","🎮","💎","💎"];
-  cards = emojis.sort(()=>0.5 - Math.random());
-  flipped = [];
-
-  const board = document.getElementById("memoryBoard");
+  const emojis=["🔥","🔥","⚡","⚡","🎮","🎮","💎","💎"];
+  cards=emojis.sort(()=>0.5-Math.random());
+  flipped=[];
+  let board=document.getElementById("memoryBoard");
   board.innerHTML="";
 
-  cards.forEach((emoji,index)=>{
-    let btn = document.createElement("button");
+  cards.forEach((emoji,i)=>{
+    let btn=document.createElement("button");
     btn.innerText="?";
     btn.style.margin="5px";
-    btn.onclick=()=>flipCard(btn,index,emoji);
+    btn.onclick=()=>flipCard(btn,emoji);
     board.appendChild(btn);
   });
 }
 
-function flipCard(btn,index,emoji){
+function flipCard(btn,emoji){
   if(flipped.length<2){
     btn.innerText=emoji;
     flipped.push({btn,emoji});
@@ -168,9 +190,100 @@ function flipCard(btn,index,emoji){
   }
 }
 
+/* BRICK GAME */
+let paddle,ball,bricks,brickRunning,brickScore;
+
+function startBrick(){
+  paddle={x:160,width:80};
+  ball={x:200,y:200,dx:3,dy:-3};
+  bricks=[];
+  brickScore=0;
+  brickRunning=true;
+
+  for(let i=0;i<5;i++){
+    for(let j=0;j<3;j++){
+      bricks.push({x:i*80+10,y:j*30+10});
+    }
+  }
+}
+
+document.addEventListener("mousemove", e=>{
+  if(!brickRunning) return;
+  paddle.x=e.clientX-50;
+});
+
+function updateBrick(){
+  if(!brickRunning) return;
+
+  ball.x+=ball.dx;
+  ball.y+=ball.dy;
+
+  if(ball.x<0||ball.x>400) ball.dx*=-1;
+  if(ball.y<0) ball.dy*=-1;
+
+  if(ball.y>380 && ball.x>paddle.x && ball.x<paddle.x+paddle.width){
+    ball.dy*=-1;
+  }
+
+  bricks.forEach((b,i)=>{
+    if(ball.x>b.x && ball.x<b.x+60 && ball.y>b.y && ball.y<b.y+20){
+      bricks.splice(i,1);
+      ball.dy*=-1;
+      brickScore++;
+    }
+  });
+
+  if(ball.y>400){
+    brickRunning=false;
+    document.getElementById("brickScore").innerText="Game Over: "+brickScore;
+  }
+}
+
+function drawBrick(){
+  let ctx=document.getElementById("brickCanvas").getContext("2d");
+  ctx.clearRect(0,0,400,400);
+
+  ctx.fillRect(paddle.x,380,paddle.width,10);
+  ctx.beginPath();
+  ctx.arc(ball.x,ball.y,8,0,Math.PI*2);
+  ctx.fill();
+
+  bricks.forEach(b=>ctx.fillRect(b.x,b.y,60,20));
+}
+
+function loopBrick(){
+  updateBrick();
+  drawBrick();
+  requestAnimationFrame(loopBrick);
+}
+loopBrick();
+
+/* REACTION GAME */
+let reactionStart;
+
+function startReaction(){
+  document.getElementById("reactionText").innerText="Wait...";
+
+  setTimeout(()=>{
+    document.body.style.background="green";
+    reactionStart=Date.now();
+
+    document.body.onclick=()=>{
+      let time=Date.now()-reactionStart;
+      document.getElementById("reactionText").innerText="Time: "+time+" ms";
+      document.body.style.background="#0a0a0f";
+      document.body.onclick=null;
+    };
+
+  },Math.random()*3000+2000);
+}
+
 </script>
 
 </body>
 </html>
 
- 
+
+  
+
+  
