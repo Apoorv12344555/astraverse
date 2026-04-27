@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AstraVerse Pro</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;600&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
-
-<link rel="icon" href="logo.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
 
 <style>
 body{
@@ -15,54 +13,19 @@ body{
   font-family:'Poppins',sans-serif;
   background:#0a0a0f;
   color:white;
+  text-align:center;
 }
 
-/* NAVBAR */
-nav{
-  display:flex;
-  justify-content:space-between;
-  padding:15px 30px;
-  border-bottom:1px solid #1f1f2e;
-}
 .logo{
   font-family:'Orbitron';
   color:#6cf;
-  text-shadow:0 0 10px #6cf;
-}
-
-/* HERO */
-.hero{
-  text-align:center;
-  padding:60px 20px;
-}
-.hero h1{
-  font-family:'Rajdhani';
-  font-size:2.5rem;
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
-  padding:30px;
-}
-
-/* CARD */
-.card{
-  background:#111;
-  padding:20px;
-  border-radius:15px;
-  transition:0.3s;
-  box-shadow:0 0 10px #000;
-}
-.card:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 20px #6cf;
+  font-size:1.5rem;
+  margin:20px;
 }
 
 .btn{
   padding:10px 20px;
+  margin:10px;
   border:none;
   border-radius:20px;
   background:linear-gradient(90deg,#6cf,#a855f7);
@@ -70,143 +33,144 @@ nav{
   cursor:pointer;
 }
 
-/* GAME SCREEN */
-#gameScreen{
-  display:none;
-  text-align:center;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+  padding:30px;
 }
 
-canvas{
-  background:#000;
-  border:1px solid #6cf;
-  border-radius:10px;
-  margin-top:20px;
+.card{
+  background:#111;
+  padding:20px;
+  border-radius:15px;
 }
+
+.game{display:none}
+.active{display:block}
 </style>
 </head>
 
 <body>
 
-<nav>
 <div class="logo">⚡ AstraVerse Pro</div>
-</nav>
 
-<section class="hero">
-<h1>Play Futuristic Web Games</h1>
-</section>
+<h1>Choose a Game</h1>
 
-<!-- GAME CARDS -->
-<section class="grid">
+<div class="grid">
 
 <div class="card">
-<h3>Neon Dodge</h3>
-<p>Avoid obstacles and survive</p>
-<button class="btn" onclick="openGame()">Play</button>
+<h3>🎯 Click Target</h3>
+<button class="btn" onclick="showGame('clickGame')">Play</button>
 </div>
 
 <div class="card">
-<h3>Coming Soon</h3>
-<p>More games arriving...</p>
+<h3>🧠 Memory Game</h3>
+<button class="btn" onclick="showGame('memoryGame')">Play</button>
 </div>
 
-</section>
+</div>
 
-<!-- GAME SCREEN -->
-<section id="gameScreen">
-<h2>Neon Dodge</h2>
-<canvas id="gameCanvas" width="400" height="500"></canvas>
-<p id="score"></p>
-<button class="btn" onclick="startGame()">Start</button>
-<button class="btn" onclick="closeGame()">Back</button>
-</section>
+<!-- CLICK GAME -->
+<div id="clickGame" class="game">
+<h2>Click Target Game</h2>
+<p id="clickScore">Score: 0</p>
+<button class="btn" onclick="startClick()">Start</button>
+<br>
+<button class="btn" id="target" onclick="hitTarget()" style="display:none">🎯</button>
+</div>
+
+<!-- MEMORY GAME -->
+<div id="memoryGame" class="game">
+<h2>Memory Game</h2>
+<p id="memoryStatus">Click Start</p>
+<button class="btn" onclick="startMemory()">Start</button>
+<div id="memoryBoard"></div>
+</div>
 
 <script>
 
-// OPEN GAME
-function openGame(){
-  document.querySelector('.grid').style.display='none';
-  document.getElementById('gameScreen').style.display='block';
+// SWITCH GAME
+function showGame(id){
+  document.querySelectorAll('.game').forEach(g=>g.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-// CLOSE GAME
-function closeGame(){
-  document.querySelector('.grid').style.display='grid';
-  document.getElementById('gameScreen').style.display='none';
+/* 🎯 CLICK TARGET GAME */
+
+let clickScore=0;
+let clickRunning=false;
+
+function startClick(){
+  clickScore=0;
+  clickRunning=true;
+  document.getElementById("clickScore").innerText="Score: 0";
+  document.getElementById("target").style.display="inline-block";
+  moveTarget();
 }
 
-/* GAME CODE */
+function moveTarget(){
+  if(!clickRunning) return;
 
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+  let btn=document.getElementById("target");
+  btn.style.position="absolute";
+  btn.style.left=Math.random()*80+"%";
+  btn.style.top=Math.random()*80+"%";
 
-let player, obstacles, running, score;
-
-function resetGame(){
-  player={x:180,y:450,size:20};
-  obstacles=[];
-  score=0;
+  setTimeout(moveTarget,1000);
 }
 
-function startGame(){
-  resetGame();
-  running=true;
+function hitTarget(){
+  if(clickRunning){
+    clickScore++;
+    document.getElementById("clickScore").innerText="Score: "+clickScore;
+  }
 }
 
-document.addEventListener('keydown', e=>{
-  if(!running) return;
-  if(e.key==="ArrowLeft" && player.x>0) player.x-=15;
-  if(e.key==="ArrowRight" && player.x<380) player.x+=15;
-});
+/* 🧠 MEMORY GAME */
 
-function spawn(){
-  obstacles.push({x:Math.random()*380,y:0,size:20});
+let cards = [];
+let flipped = [];
+
+function startMemory(){
+  const emojis = ["🔥","🔥","⚡","⚡","🎮","🎮","💎","💎"];
+  cards = emojis.sort(()=>0.5 - Math.random());
+  flipped = [];
+
+  const board = document.getElementById("memoryBoard");
+  board.innerHTML="";
+
+  cards.forEach((emoji,index)=>{
+    let btn = document.createElement("button");
+    btn.innerText="?";
+    btn.style.margin="5px";
+    btn.onclick=()=>flipCard(btn,index,emoji);
+    board.appendChild(btn);
+  });
 }
 
-function update(){
-  if(!running) return;
+function flipCard(btn,index,emoji){
+  if(flipped.length<2){
+    btn.innerText=emoji;
+    flipped.push({btn,emoji});
 
-  if(Math.random()<0.05) spawn();
-
-  for(let o of obstacles){
-    o.y+=4;
-
-    if(
-      o.x < player.x+player.size &&
-      o.x+o.size > player.x &&
-      o.y < player.y+player.size &&
-      o.y+o.size > player.y
-    ){
-      running=false;
-      document.getElementById('score').innerText="Game Over: "+score;
-      return;
+    if(flipped.length===2){
+      if(flipped[0].emoji===flipped[1].emoji){
+        flipped=[];
+      }else{
+        setTimeout(()=>{
+          flipped[0].btn.innerText="?";
+          flipped[1].btn.innerText="?";
+          flipped=[];
+        },800);
+      }
     }
   }
-
-  obstacles=obstacles.filter(o=>o.y<500);
-  score++;
-  document.getElementById('score').innerText="Score: "+score;
 }
-
-function draw(){
-  ctx.clearRect(0,0,400,500);
-
-  ctx.fillStyle="#6cf";
-  ctx.fillRect(player.x,player.y,20,20);
-
-  ctx.fillStyle="red";
-  obstacles.forEach(o=>ctx.fillRect(o.x,o.y,20,20));
-}
-
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-
-resetGame();
-loop();
 
 </script>
 
 </body>
 </html>
+
+ 
