@@ -16,16 +16,29 @@ body{
   text-align:center;
 }
 
-/* LOGO */
+nav{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  padding:15px;
+  background:#020617;
+}
+nav a{
+  color:#00f7ff;
+  text-decoration:none;
+  cursor:pointer;
+}
+
 .logo{
   font-family:'Orbitron';
   color:#00f7ff;
   font-size:2rem;
   margin:20px;
-  text-shadow:0 0 15px #00f7ff;
 }
 
-/* GRID */
+.section{display:none;padding:20px}
+.active{display:block}
+
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -33,19 +46,12 @@ body{
   padding:30px;
 }
 
-/* CARD */
 .card{
   background:rgba(255,255,255,0.05);
   padding:25px;
   border-radius:20px;
-  transition:0.3s;
-}
-.card:hover{
-  transform:translateY(-10px);
-  box-shadow:0 0 20px #00f7ff;
 }
 
-/* BUTTON */
 .btn{
   padding:10px 20px;
   margin:10px;
@@ -54,208 +60,105 @@ body{
   background:linear-gradient(90deg,#00f7ff,#a855f7);
   color:white;
   cursor:pointer;
-  transition:0.3s;
-}
-.btn:active{
-  transform:scale(0.9);
 }
 
-/* GAME */
 .game{display:none}
-.active{display:block}
+.game.active{display:block}
 
-/* CANVAS */
-canvas{
-  background:#000;
-  border:2px solid #00f7ff;
-  margin-top:20px;
-}
-
-/* MOBILE */
 @media(max-width:600px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-  button{
-    width:90%;
-  }
+  .grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="logo"> AstraVerse Pro</div>
+<div class="logo">⚡ AstraVerse Pro</div>
 
-<!-- USER -->
-<div>
+<nav>
+<a onclick="showSection('home')">Home</a>
+<a onclick="showSection('about')">About</a>
+<a onclick="showSection('contact')">Contact</a>
+<a onclick="showSection('privacy')">Privacy Policy</a>
+</nav>
+
+<!-- HOME -->
+<div id="home" class="section active">
+
 <input id="username" placeholder="Enter your name">
 <button class="btn" onclick="saveUser()">Save</button>
 <p id="welcome"></p>
-</div>
 
 <h2>Choose Game</h2>
 
 <div class="grid">
-<div class="card"><button class="btn" onclick="showGame('clickGame')">🎯 Click Game</button></div>
-<div class="card"><button class="btn" onclick="showGame('memoryGame')">🧠 Memory Game</button></div>
 <div class="card"><button class="btn" onclick="showGame('ticGame')">⭕ Tic Tac Toe</button></div>
 <div class="card"><button class="btn" onclick="showGame('guessGame')">🎲 Guess Number</button></div>
 </div>
 
-<!-- CLICK GAME -->
-<div id="clickGame" class="game">
-<h2>Click Game</h2>
-<p id="clickScore">Score: 0</p>
-<p id="clickBoard"></p>
-<button class="btn" onclick="startClick()">Start</button>
-<button id="target" onclick="hitTarget()" style="display:none">🎯</button>
-</div>
-
-<!-- MEMORY GAME -->
-<div id="memoryGame" class="game">
-<h2>Memory Game</h2>
-<p id="memoryBoardScore"></p>
-<button class="btn" onclick="startMemory()">Start</button>
-<div id="memoryBoard"></div>
-</div>
-
-<!-- TIC TAC TOE -->
+<!-- TIC -->
 <div id="ticGame" class="game">
-<h2>Tic Tac Toe</h2>
-<p id="ticBoardScore"></p>
+<h3>Tic Tac Toe</h3>
 <div id="ticBoard"></div>
 <button class="btn" onclick="startTic()">Start</button>
 </div>
 
-<!-- GUESS GAME -->
+<!-- GUESS -->
 <div id="guessGame" class="game">
-<h2>Guess Number</h2>
-<p id="guessBoard"></p>
+<h3>Guess Number</h3>
 <input id="guessInput">
 <button class="btn" onclick="checkGuess()">Guess</button>
 <p id="guessResult"></p>
 </div>
 
+</div>
+
+<!-- ABOUT -->
+<div id="about" class="section">
+<h2>About AstraVerse Pro</h2>
+<p>
+AstraVerse Pro is a gaming platform created by Apoorv Srivastava.
+It is designed to provide simple, fun, and engaging games for everyone.
+Our mission is to create powerful and enjoyable digital experiences.
+</p>
+</div>
+
+<!-- CONTACT -->
+<div id="contact" class="section">
+<h2>Contact</h2>
+<p>Email: apoorv8035@email.com</p>
+<p>For any queries, feedback, or support, feel free to contact us.</p>
+</div>
+
+<!-- PRIVACY -->
+<div id="privacy" class="section">
+<h2>Privacy Policy</h2>
+<p>
+We respect your privacy. This website may collect basic data such as your name for gameplay purposes.
+We may also use cookies and third-party services like Google AdSense to display ads.
+No personal data is shared with unauthorized parties.
+</p>
+</div>
+
 <script>
 
-/* USER SYSTEM */
+/* SECTION SWITCH */
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* USER */
 function saveUser(){
   let name=document.getElementById("username").value;
   localStorage.setItem("user",name);
   document.getElementById("welcome").innerText="Welcome "+name;
 }
 
-function getUser(){
-  return localStorage.getItem("user")||"Player";
-}
-
-window.onload = ()=>{
-  let name = localStorage.getItem("user");
-  if(name){
-    document.getElementById("welcome").innerText="Welcome "+name;
-  }
-}
-
 /* GAME SWITCH */
 function showGame(id){
   document.querySelectorAll('.game').forEach(g=>g.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-}
-
-/* LEADERBOARD */
-function saveScore(game,score){
-  let user=getUser();
-  let data=JSON.parse(localStorage.getItem(game))||[];
-  data.push({user,score});
-  data.sort((a,b)=>b.score-a.score);
-  data=data.slice(0,5);
-  localStorage.setItem(game,JSON.stringify(data));
-}
-
-function showBoard(game,element){
-  let data=JSON.parse(localStorage.getItem(game))||[];
-  document.getElementById(element).innerText =
-    data.map(d=>d.user+": "+d.score).join(" | ");
-}
-
-/* CLICK GAME */
-let clickScore=0, running=false;
-
-function startClick(){
-  clickScore=0;
-  running=true;
-  document.getElementById("target").style.display="inline";
-  move();
-  showBoard("click","clickBoard");
-}
-
-function move(){
-  if(!running) return;
-  let t=document.getElementById("target");
-  t.style.position="absolute";
-  t.style.left=Math.random()*80+"%";
-  t.style.top=Math.random()*80+"%";
-  setTimeout(move,800);
-}
-
-function hitTarget(){
-  if(running){
-    clickScore++;
-    document.getElementById("clickScore").innerText="Score: "+clickScore;
-
-    if(clickScore>=10){
-      running=false;
-      saveScore("click",clickScore);
-      showBoard("click","clickBoard");
-      alert("Game Over");
-    }
-  }
-}
-
-/* MEMORY GAME */
-let flipped=[],moves=0;
-
-function startMemory(){
-  moves=0;
-  const emojis=["🔥","🔥","⚡","⚡","🎮","🎮","💎","💎"];
-  let cards=emojis.sort(()=>0.5-Math.random());
-  let board=document.getElementById("memoryBoard");
-  board.innerHTML="";
-  flipped=[];
-
-  cards.forEach(e=>{
-    let b=document.createElement("button");
-    b.innerText="?";
-    b.onclick=()=>flip(b,e);
-    board.appendChild(b);
-  });
-
-  showBoard("memory","memoryBoardScore");
-}
-
-function flip(btn,e){
-  if(flipped.length<2){
-    btn.innerText=e;
-    flipped.push({btn,e});
-    moves++;
-
-    if(flipped.length===2){
-      if(flipped[0].e!==flipped[1].e){
-        setTimeout(()=>{
-          flipped[0].btn.innerText="?";
-          flipped[1].btn.innerText="?";
-          flipped=[];
-        },800);
-      }else flipped=[];
-    }
-
-    if(moves>=12){
-      saveScore("memory",moves);
-      showBoard("memory","memoryBoardScore");
-      alert("Game Over Moves:"+moves);
-    }
-  }
 }
 
 /* TIC TAC TOE */
@@ -274,8 +177,6 @@ function startTic(){
     btn.onclick=()=>playMove(btn,i);
     board.appendChild(btn);
   }
-
-  showBoard("tic","ticBoardScore");
 }
 
 function playMove(btn,i){
@@ -285,8 +186,6 @@ function playMove(btn,i){
 
     if(checkWin()){
       alert(turn+" Wins!");
-      saveScore("tic",10);
-      showBoard("tic","ticBoardScore");
       return;
     }
 
@@ -316,8 +215,6 @@ function checkGuess(){
 
   if(g==number){
     document.getElementById("guessResult").innerText="Correct!";
-    saveScore("guess",10);
-    showBoard("guess","guessBoard");
     number=Math.floor(Math.random()*10);
   } else {
     document.getElementById("guessResult").innerText="Try Again";
@@ -328,3 +225,9 @@ function checkGuess(){
 
 </body>
 </html>
+
+
+
+
+ 
+  
