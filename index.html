@@ -11,47 +11,75 @@
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
-  background:#0a0a0f;
+  background: radial-gradient(circle at top, #0f172a, #020617);
   color:white;
   text-align:center;
 }
 
 .logo{
   font-family:'Orbitron';
-  color:#6cf;
-  font-size:1.5rem;
+  color:#00f7ff;
+  font-size:2rem;
   margin:20px;
+  text-shadow:0 0 15px #00f7ff;
+}
+
+h1{
+  text-shadow:0 0 10px #6cf;
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:20px;
+  gap:25px;
   padding:30px;
 }
 
 .card{
-  background:#111;
-  padding:20px;
-  border-radius:15px;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter:blur(10px);
+  padding:25px;
+  border-radius:20px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-10px) scale(1.03);
+  box-shadow:0 0 20px #00f7ff;
 }
 
 .btn{
   padding:10px 20px;
   margin:10px;
   border:none;
-  border-radius:20px;
-  background:linear-gradient(90deg,#6cf,#a855f7);
+  border-radius:30px;
+  background:linear-gradient(90deg,#00f7ff,#a855f7);
   color:white;
   cursor:pointer;
+  transition:0.3s;
 }
 
-.game{display:none}
+.btn:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 15px #00f7ff;
+}
+
+.game{
+  display:none;
+  animation:fadeIn 0.5s ease;
+}
+
 .active{display:block}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
 
 canvas{
   background:#000;
-  border:1px solid #6cf;
+  border:2px solid #00f7ff;
+  box-shadow:0 0 15px #00f7ff;
   margin-top:20px;
 }
 </style>
@@ -59,8 +87,11 @@ canvas{
 
 <body>
 
-<div class="logo"> AstraVerse Pro</div>
+<!-- SOUND -->
+<audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="gameOverSound" src="https://www.soundjay.com/misc/sounds/fail-buzzer-02.mp3"></audio>
 
+<div class="logo">⚡ AstraVerse Pro</div>
 <h1>Choose a Game</h1>
 
 <div class="grid">
@@ -120,7 +151,15 @@ canvas{
 
 <script>
 
-// SWITCH
+/* SOUND */
+function playClick(){
+  document.getElementById("clickSound").play();
+}
+function playGameOver(){
+  document.getElementById("gameOverSound").play();
+}
+
+/* SWITCH */
 function showGame(id){
   document.querySelectorAll('.game').forEach(g=>g.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -142,11 +181,12 @@ function moveTarget(){
   btn.style.position="absolute";
   btn.style.left=Math.random()*80+"%";
   btn.style.top=Math.random()*80+"%";
-  setTimeout(moveTarget,1000);
+  setTimeout(moveTarget,800);
 }
 
 function hitTarget(){
   if(clickRunning){
+    playClick();
     clickScore++;
     document.getElementById("clickScore").innerText="Score: "+clickScore;
   }
@@ -162,10 +202,10 @@ function startMemory(){
   let board=document.getElementById("memoryBoard");
   board.innerHTML="";
 
-  cards.forEach((emoji,i)=>{
+  cards.forEach((emoji)=>{
     let btn=document.createElement("button");
     btn.innerText="?";
-    btn.style.margin="5px";
+    btn.className="btn";
     btn.onclick=()=>flipCard(btn,emoji);
     board.appendChild(btn);
   });
@@ -173,6 +213,7 @@ function startMemory(){
 
 function flipCard(btn,emoji){
   if(flipped.length<2){
+    playClick();
     btn.innerText=emoji;
     flipped.push({btn,emoji});
 
@@ -235,6 +276,7 @@ function updateBrick(){
 
   if(ball.y>400){
     brickRunning=false;
+    playGameOver();
     document.getElementById("brickScore").innerText="Game Over: "+brickScore;
   }
 }
@@ -269,21 +311,27 @@ function startReaction(){
     reactionStart=Date.now();
 
     document.body.onclick=()=>{
+      playClick();
       let time=Date.now()-reactionStart;
       document.getElementById("reactionText").innerText="Time: "+time+" ms";
-      document.body.style.background="#0a0a0f";
+      document.body.style.background="#020617";
       document.body.onclick=null;
     };
 
   },Math.random()*3000+2000);
 }
 
+/* BUTTON EFFECT */
+document.querySelectorAll('.btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    btn.style.transform='scale(0.9)';
+    setTimeout(()=>btn.style.transform='scale(1)',100);
+  });
+});
+
 </script>
 
 </body>
 </html>
-
-
-  
-
+ 
   
