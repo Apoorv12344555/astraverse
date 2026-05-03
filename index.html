@@ -24,10 +24,6 @@ body{
   text-shadow:0 0 15px #00f7ff;
 }
 
-h1{
-  text-shadow:0 0 10px #6cf;
-}
-
 .grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -37,14 +33,13 @@ h1{
 
 .card{
   background:rgba(255,255,255,0.05);
-  backdrop-filter:blur(10px);
   padding:25px;
   border-radius:20px;
   transition:0.3s;
 }
 
 .card:hover{
-  transform:translateY(-10px) scale(1.03);
+  transform:translateY(-10px);
   box-shadow:0 0 20px #00f7ff;
 }
 
@@ -56,30 +51,14 @@ h1{
   background:linear-gradient(90deg,#00f7ff,#a855f7);
   color:white;
   cursor:pointer;
-  transition:0.3s;
 }
 
-.btn:hover{
-  transform:scale(1.1);
-  box-shadow:0 0 15px #00f7ff;
-}
-
-.game{
-  display:none;
-  animation:fadeIn 0.5s ease;
-}
-
+.game{display:none}
 .active{display:block}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(20px);}
-  to{opacity:1; transform:translateY(0);}
-}
 
 canvas{
   background:#000;
   border:2px solid #00f7ff;
-  box-shadow:0 0 15px #00f7ff;
   margin-top:20px;
 }
 </style>
@@ -87,76 +66,68 @@ canvas{
 
 <body>
 
-<!-- SOUND -->
-<audio id="clickSound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
-<audio id="gameOverSound" src="https://www.soundjay.com/misc/sounds/fail-buzzer-02.mp3"></audio>
-
 <div class="logo">⚡ AstraVerse Pro</div>
-<h1>Choose a Game</h1>
+
+<!-- USERNAME -->
+<div>
+<input id="username" placeholder="Enter your name">
+<button class="btn" onclick="saveUser()">Save</button>
+<p id="welcome"></p>
+</div>
+
+<h2>Choose Game</h2>
 
 <div class="grid">
-
-<div class="card">
-<h3>🎯 Click Target</h3>
-<button class="btn" onclick="showGame('clickGame')">Play</button>
-</div>
-
-<div class="card">
-<h3>🧠 Memory Game</h3>
-<button class="btn" onclick="showGame('memoryGame')">Play</button>
-</div>
-
-<div class="card">
-<h3>🧱 Brick Breaker</h3>
-<button class="btn" onclick="showGame('brickGame')">Play</button>
-</div>
-
-<div class="card">
-<h3>⚡ Reaction Game</h3>
-<button class="btn" onclick="showGame('reactionGame')">Play</button>
-</div>
-
+<div class="card"><button class="btn" onclick="showGame('clickGame')">🎯 Click Game</button></div>
+<div class="card"><button class="btn" onclick="showGame('memoryGame')">🧠 Memory</button></div>
+<div class="card"><button class="btn" onclick="showGame('brickGame')">🧱 Brick</button></div>
+<div class="card"><button class="btn" onclick="showGame('reactionGame')">⚡ Reaction</button></div>
 </div>
 
 <!-- CLICK GAME -->
 <div id="clickGame" class="game">
-<h2>Click Target</h2>
+<h2>Click Game</h2>
 <p id="clickScore">Score: 0</p>
+<p id="clickBoard"></p>
 <button class="btn" onclick="startClick()">Start</button>
-<br>
-<button class="btn" id="target" onclick="hitTarget()" style="display:none">🎯</button>
+<button id="target" onclick="hitTarget()" style="display:none">🎯</button>
 </div>
 
-<!-- MEMORY GAME -->
+<!-- MEMORY -->
 <div id="memoryGame" class="game">
 <h2>Memory Game</h2>
+<p id="memoryBoardScore"></p>
 <button class="btn" onclick="startMemory()">Start</button>
 <div id="memoryBoard"></div>
 </div>
 
-<!-- BRICK GAME -->
+<!-- BRICK -->
 <div id="brickGame" class="game">
 <h2>Brick Breaker</h2>
 <canvas id="brickCanvas" width="400" height="400"></canvas>
-<p id="brickScore"></p>
+<p id="brickBoard"></p>
 <button class="btn" onclick="startBrick()">Start</button>
 </div>
 
-<!-- REACTION GAME -->
+<!-- REACTION -->
 <div id="reactionGame" class="game">
 <h2>Reaction Game</h2>
 <p id="reactionText">Click Start</p>
+<p id="reactionBoard"></p>
 <button class="btn" onclick="startReaction()">Start</button>
 </div>
 
 <script>
 
-/* SOUND */
-function playClick(){
-  document.getElementById("clickSound").play();
+/* USER */
+function saveUser(){
+  let name=document.getElementById("username").value;
+  localStorage.setItem("user",name);
+  document.getElementById("welcome").innerText="Welcome "+name;
 }
-function playGameOver(){
-  document.getElementById("gameOverSound").play();
+
+function getUser(){
+  return localStorage.getItem("user")||"Player";
 }
 
 /* SWITCH */
@@ -165,96 +136,126 @@ function showGame(id){
   document.getElementById(id).classList.add('active');
 }
 
+/* LEADERBOARD */
+function saveScore(game,score){
+  let user=getUser();
+  let data=JSON.parse(localStorage.getItem(game))||[];
+  data.push({user,score});
+  data.sort((a,b)=>b.score-a.score);
+  data=data.slice(0,5);
+  localStorage.setItem(game,JSON.stringify(data));
+}
+
+function showBoard(game,element){
+  let data=JSON.parse(localStorage.getItem(game))||[];
+  document.getElementById(element).innerText =
+    data.map(d=>d.user+": "+d.score).join(" | ");
+}
+
 /* CLICK GAME */
-let clickScore=0, clickRunning=false;
+let clickScore=0, running=false;
 
 function startClick(){
   clickScore=0;
-  clickRunning=true;
-  document.getElementById("target").style.display="inline-block";
-  moveTarget();
+  running=true;
+  document.getElementById("target").style.display="inline";
+  move();
+  showBoard("click","clickBoard");
 }
 
-function moveTarget(){
-  if(!clickRunning) return;
-  let btn=document.getElementById("target");
-  btn.style.position="absolute";
-  btn.style.left=Math.random()*80+"%";
-  btn.style.top=Math.random()*80+"%";
-  setTimeout(moveTarget,800);
+function move(){
+  if(!running) return;
+  let t=document.getElementById("target");
+  t.style.position="absolute";
+  t.style.left=Math.random()*80+"%";
+  t.style.top=Math.random()*80+"%";
+  setTimeout(move,800);
 }
 
 function hitTarget(){
-  if(clickRunning){
-    playClick();
+  if(running){
     clickScore++;
     document.getElementById("clickScore").innerText="Score: "+clickScore;
+
+    if(clickScore>=10){
+      running=false;
+      saveScore("click",clickScore);
+      showBoard("click","clickBoard");
+      alert("Game Over");
+    }
   }
 }
 
-/* MEMORY GAME */
-let cards=[], flipped=[];
+/* MEMORY */
+let flipped=[],moves=0;
 
 function startMemory(){
+  moves=0;
   const emojis=["🔥","🔥","⚡","⚡","🎮","🎮","💎","💎"];
-  cards=emojis.sort(()=>0.5-Math.random());
-  flipped=[];
+  let cards=emojis.sort(()=>0.5-Math.random());
   let board=document.getElementById("memoryBoard");
   board.innerHTML="";
+  flipped=[];
 
-  cards.forEach((emoji)=>{
-    let btn=document.createElement("button");
-    btn.innerText="?";
-    btn.className="btn";
-    btn.onclick=()=>flipCard(btn,emoji);
-    board.appendChild(btn);
+  cards.forEach(e=>{
+    let b=document.createElement("button");
+    b.innerText="?";
+    b.onclick=()=>flip(b,e);
+    board.appendChild(b);
   });
+
+  showBoard("memory","memoryBoardScore");
 }
 
-function flipCard(btn,emoji){
+function flip(btn,e){
   if(flipped.length<2){
-    playClick();
-    btn.innerText=emoji;
-    flipped.push({btn,emoji});
+    btn.innerText=e;
+    flipped.push({btn,e});
+    moves++;
 
     if(flipped.length===2){
-      if(flipped[0].emoji===flipped[1].emoji){
-        flipped=[];
-      }else{
+      if(flipped[0].e!==flipped[1].e){
         setTimeout(()=>{
           flipped[0].btn.innerText="?";
           flipped[1].btn.innerText="?";
           flipped=[];
         },800);
-      }
+      }else flipped=[];
+    }
+
+    if(moves>=12){
+      saveScore("memory",moves);
+      showBoard("memory","memoryBoardScore");
+      alert("Game Over Moves:"+moves);
     }
   }
 }
 
-/* BRICK GAME */
-let paddle,ball,bricks,brickRunning,brickScore;
+/* BRICK */
+let paddle,ball,bricks,runB,scoreB;
 
 function startBrick(){
   paddle={x:160,width:80};
   ball={x:200,y:200,dx:3,dy:-3};
   bricks=[];
-  brickScore=0;
-  brickRunning=true;
+  scoreB=0;
+  runB=true;
 
   for(let i=0;i<5;i++){
     for(let j=0;j<3;j++){
       bricks.push({x:i*80+10,y:j*30+10});
     }
   }
+
+  showBoard("brick","brickBoard");
 }
 
-document.addEventListener("mousemove", e=>{
-  if(!brickRunning) return;
-  paddle.x=e.clientX-50;
+document.addEventListener("mousemove",e=>{
+  if(runB) paddle.x=e.clientX-50;
 });
 
-function updateBrick(){
-  if(!brickRunning) return;
+function update(){
+  if(!runB) return;
 
   ball.x+=ball.dx;
   ball.y+=ball.dy;
@@ -270,68 +271,60 @@ function updateBrick(){
     if(ball.x>b.x && ball.x<b.x+60 && ball.y>b.y && ball.y<b.y+20){
       bricks.splice(i,1);
       ball.dy*=-1;
-      brickScore++;
+      scoreB++;
     }
   });
 
   if(ball.y>400){
-    brickRunning=false;
-    playGameOver();
-    document.getElementById("brickScore").innerText="Game Over: "+brickScore;
+    runB=false;
+    saveScore("brick",scoreB);
+    showBoard("brick","brickBoard");
+    alert("Game Over");
   }
 }
 
-function drawBrick(){
+function draw(){
   let ctx=document.getElementById("brickCanvas").getContext("2d");
   ctx.clearRect(0,0,400,400);
-
   ctx.fillRect(paddle.x,380,paddle.width,10);
   ctx.beginPath();
   ctx.arc(ball.x,ball.y,8,0,Math.PI*2);
   ctx.fill();
-
   bricks.forEach(b=>ctx.fillRect(b.x,b.y,60,20));
 }
 
-function loopBrick(){
-  updateBrick();
-  drawBrick();
-  requestAnimationFrame(loopBrick);
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
 }
-loopBrick();
+loop();
 
-/* REACTION GAME */
-let reactionStart;
+/* REACTION */
+let startT;
 
 function startReaction(){
   document.getElementById("reactionText").innerText="Wait...";
 
   setTimeout(()=>{
     document.body.style.background="green";
-    reactionStart=Date.now();
+    startT=Date.now();
 
     document.body.onclick=()=>{
-      playClick();
-      let time=Date.now()-reactionStart;
-      document.getElementById("reactionText").innerText="Time: "+time+" ms";
+      let t=Date.now()-startT;
       document.body.style.background="#020617";
+      saveScore("reaction",-t); // lower better
+      showBoard("reaction","reactionBoard");
+      alert("Time:"+t+"ms");
       document.body.onclick=null;
     };
 
   },Math.random()*3000+2000);
 }
 
-/* BUTTON EFFECT */
-document.querySelectorAll('.btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    btn.style.transform='scale(0.9)';
-    setTimeout(()=>btn.style.transform='scale(1)',100);
-  });
-});
-
 </script>
 
 </body>
 </html>
- 
+  
   
