@@ -66,9 +66,9 @@ canvas{
 
 <body>
 
-<div class="logo">⚡ AstraVerse Pro</div>
+<div class="logo"> AstraVerse Pro</div>
 
-<!-- USERNAME -->
+<!-- USER -->
 <div>
 <input id="username" placeholder="Enter your name">
 <button class="btn" onclick="saveUser()">Save</button>
@@ -79,9 +79,9 @@ canvas{
 
 <div class="grid">
 <div class="card"><button class="btn" onclick="showGame('clickGame')">🎯 Click Game</button></div>
-<div class="card"><button class="btn" onclick="showGame('memoryGame')">🧠 Memory</button></div>
-<div class="card"><button class="btn" onclick="showGame('brickGame')">🧱 Brick</button></div>
-<div class="card"><button class="btn" onclick="showGame('reactionGame')">⚡ Reaction</button></div>
+<div class="card"><button class="btn" onclick="showGame('memoryGame')">🧠 Memory Game</button></div>
+<div class="card"><button class="btn" onclick="showGame('ticGame')">⭕ Tic Tac Toe</button></div>
+<div class="card"><button class="btn" onclick="showGame('guessGame')">🎲 Guess Number</button></div>
 </div>
 
 <!-- CLICK GAME -->
@@ -101,20 +101,21 @@ canvas{
 <div id="memoryBoard"></div>
 </div>
 
-<!-- BRICK -->
-<div id="brickGame" class="game">
-<h2>Brick Breaker</h2>
-<canvas id="brickCanvas" width="400" height="400"></canvas>
-<p id="brickBoard"></p>
-<button class="btn" onclick="startBrick()">Start</button>
+<!-- TIC TAC TOE -->
+<div id="ticGame" class="game">
+<h2>Tic Tac Toe</h2>
+<p id="ticBoardScore"></p>
+<div id="ticBoard"></div>
+<button class="btn" onclick="startTic()">Start</button>
 </div>
 
-<!-- REACTION -->
-<div id="reactionGame" class="game">
-<h2>Reaction Game</h2>
-<p id="reactionText">Click Start</p>
-<p id="reactionBoard"></p>
-<button class="btn" onclick="startReaction()">Start</button>
+<!-- GUESS -->
+<div id="guessGame" class="game">
+<h2>Guess Number</h2>
+<p id="guessBoard"></p>
+<input id="guessInput">
+<button class="btn" onclick="checkGuess()">Guess</button>
+<p id="guessResult"></p>
 </div>
 
 <script>
@@ -125,7 +126,6 @@ function saveUser(){
   localStorage.setItem("user",name);
   document.getElementById("welcome").innerText="Welcome "+name;
 }
-
 function getUser(){
   return localStorage.getItem("user")||"Player";
 }
@@ -186,7 +186,7 @@ function hitTarget(){
   }
 }
 
-/* MEMORY */
+/* MEMORY GAME */
 let flipped=[],moves=0;
 
 function startMemory(){
@@ -231,100 +231,46 @@ function flip(btn,e){
   }
 }
 
-/* BRICK */
-let paddle,ball,bricks,runB,scoreB;
+/* TIC TAC TOE */
+let turn="X";
 
-function startBrick(){
-  paddle={x:160,width:80};
-  ball={x:200,y:200,dx:3,dy:-3};
-  bricks=[];
-  scoreB=0;
-  runB=true;
+function startTic(){
+  let board=document.getElementById("ticBoard");
+  board.innerHTML="";
+  turn="X";
 
-  for(let i=0;i<5;i++){
-    for(let j=0;j<3;j++){
-      bricks.push({x:i*80+10,y:j*30+10});
-    }
-  }
-
-  showBoard("brick","brickBoard");
-}
-
-document.addEventListener("mousemove",e=>{
-  if(runB) paddle.x=e.clientX-50;
-});
-
-function update(){
-  if(!runB) return;
-
-  ball.x+=ball.dx;
-  ball.y+=ball.dy;
-
-  if(ball.x<0||ball.x>400) ball.dx*=-1;
-  if(ball.y<0) ball.dy*=-1;
-
-  if(ball.y>380 && ball.x>paddle.x && ball.x<paddle.x+paddle.width){
-    ball.dy*=-1;
-  }
-
-  bricks.forEach((b,i)=>{
-    if(ball.x>b.x && ball.x<b.x+60 && ball.y>b.y && ball.y<b.y+20){
-      bricks.splice(i,1);
-      ball.dy*=-1;
-      scoreB++;
-    }
-  });
-
-  if(ball.y>400){
-    runB=false;
-    saveScore("brick",scoreB);
-    showBoard("brick","brickBoard");
-    alert("Game Over");
-  }
-}
-
-function draw(){
-  let ctx=document.getElementById("brickCanvas").getContext("2d");
-  ctx.clearRect(0,0,400,400);
-  ctx.fillRect(paddle.x,380,paddle.width,10);
-  ctx.beginPath();
-  ctx.arc(ball.x,ball.y,8,0,Math.PI*2);
-  ctx.fill();
-  bricks.forEach(b=>ctx.fillRect(b.x,b.y,60,20));
-}
-
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-loop();
-
-/* REACTION */
-let startT;
-
-function startReaction(){
-  document.getElementById("reactionText").innerText="Wait...";
-
-  setTimeout(()=>{
-    document.body.style.background="green";
-    startT=Date.now();
-
-    document.body.onclick=()=>{
-      let t=Date.now()-startT;
-      document.body.style.background="#020617";
-      saveScore("reaction",-t); // lower better
-      showBoard("reaction","reactionBoard");
-      alert("Time:"+t+"ms");
-      document.body.onclick=null;
+  for(let i=0;i<9;i++){
+    let btn=document.createElement("button");
+    btn.className="btn";
+    btn.onclick=()=>{
+      if(btn.innerText===""){
+        btn.innerText=turn;
+        turn=turn==="X"?"O":"X";
+      }
     };
+    board.appendChild(btn);
+  }
 
-  },Math.random()*3000+2000);
+  showBoard("tic","ticBoardScore");
+}
+
+/* GUESS GAME */
+let number=Math.floor(Math.random()*10);
+
+function checkGuess(){
+  let g=document.getElementById("guessInput").value;
+
+  if(g==number){
+    document.getElementById("guessResult").innerText="Correct!";
+    saveScore("guess",10);
+    showBoard("guess","guessBoard");
+    number=Math.floor(Math.random()*10);
+  } else {
+    document.getElementById("guessResult").innerText="Try Again";
+  }
 }
 
 </script>
 
 </body>
 </html>
-  
-  
