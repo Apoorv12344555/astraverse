@@ -4,75 +4,105 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AstraVerse Pro</title>
+<title>AstraVerse Pro - Play Free Games</title>
+
+<!-- SEO DESCRIPTION -->
+<meta name="description" content="AstraVerse Pro is a free online gaming platform with fun games like Tic Tac Toe and Number Guessing.">
 
 <!-- GOOGLE ADS AUTO -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR-ADSENSE-ID"
 crossorigin="anonymous"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Poppins&display=swap" rel="stylesheet">
+<!-- FONTS -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
 
 <style>
+
+/* ===== GLOBAL STYLING ===== */
 body{
   margin:0;
   font-family:Poppins;
-  background:#020617;
+  background:linear-gradient(135deg,#020617,#0f172a);
   color:white;
-  text-align:center;
 }
 
-.logo{
-  font-family:Orbitron;
-  color:#00f7ff;
-  font-size:2rem;
-  margin:20px;
-}
-
+/* ===== NAVBAR ===== */
 nav{
-  background:#000;
-  padding:10px;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  padding:15px;
+  background:#020617;
 }
 nav button{
-  margin:5px;
-  padding:10px;
-  background:#00f7ff;
+  background:none;
   border:none;
-  border-radius:20px;
+  color:#00f7ff;
   cursor:pointer;
+  font-size:1rem;
 }
 
-.section{display:none}
+/* ===== HERO SECTION ===== */
+.hero{
+  text-align:center;
+  padding:40px 20px;
+}
+.hero h1{
+  font-family:Orbitron;
+  font-size:2.5rem;
+  color:#00f7ff;
+}
+.hero p{
+  opacity:0.8;
+}
+
+/* ===== SECTIONS ===== */
+.section{display:none;padding:20px}
 .active{display:block}
 
+/* ===== GAME CARDS ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:20px;
+}
 .card{
-  background:#111;
+  background:rgba(255,255,255,0.05);
   padding:20px;
-  margin:10px;
   border-radius:20px;
 }
 
+/* BUTTON */
 .btn{
   padding:10px 20px;
-  margin:10px;
   border:none;
   border-radius:20px;
   background:linear-gradient(90deg,#00f7ff,#a855f7);
   color:white;
   cursor:pointer;
+  margin-top:10px;
 }
 
-input{
-  padding:10px;
-  border-radius:10px;
-  border:none;
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:20px;
+  background:#020617;
+  margin-top:30px;
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="logo"> AstraVerse Pro</div>
+<!-- ===== HERO ===== -->
+<div class="hero">
+<h1> AstraVerse Pro</h1>
+<p>Play fun games. Compete. Enjoy. Built by Apoorv Srivastava.</p>
+</div>
 
+<!-- ===== NAV ===== -->
 <nav>
 <button onclick="show('home')">Home</button>
 <button onclick="show('about')">About</button>
@@ -80,59 +110,87 @@ input{
 <button onclick="show('privacy')">Privacy</button>
 </nav>
 
-<!-- HOME -->
+<!-- ===== HOME ===== -->
 <div id="home" class="section active">
 
 <h3>Enter Username</h3>
-<input id="userInput">
+<input id="userInput" placeholder="Your name">
 <button class="btn" onclick="saveUser()">Save</button>
 <p id="welcome"></p>
 
-<h2>Games</h2>
+<h2>🎮 Games</h2>
+
+<div class="grid">
+<div class="card">
+<h3>Tic Tac Toe</h3>
+<p>Classic strategy game. Win to earn points.</p>
+<button class="btn" onclick="openGame('tic')">Play</button>
+</div>
 
 <div class="card">
-<button class="btn" onclick="openGame('tic')">Tic Tac Toe</button>
-<button class="btn" onclick="openGame('guess')">Guess Number</button>
+<h3>Guess Number</h3>
+<p>Try your luck and guess the number.</p>
+<button class="btn" onclick="openGame('guess')">Play</button>
+</div>
 </div>
 
-<div id="tic" class="card" style="display:none">
-<h3>Tic Tac Toe</h3>
-<div id="board"></div>
-<button class="btn" onclick="startTic()">Start</button>
-</div>
+<!-- GAME AREAS -->
+<div id="tic" class="card" style="display:none"></div>
+<div id="guess" class="card" style="display:none"></div>
 
-<div id="guess" class="card" style="display:none">
-<h3>Guess Game</h3>
-<input id="guessInput">
-<button class="btn" onclick="guess()">Try</button>
-<p id="result"></p>
-</div>
-
-<h2>Leaderboard</h2>
+<h2>🏆 Leaderboard</h2>
 <ul id="leaderboard"></ul>
 
 </div>
 
-<!-- ABOUT -->
+<!-- ===== ABOUT ===== -->
 <div id="about" class="section">
-<h2>About</h2>
-<p>AstraVerse Pro is a gaming platform built by Apoorv.</p>
+
+<h2>About AstraVerse Pro</h2>
+
+<p>
+AstraVerse Pro is a modern browser-based gaming platform created by Apoorv Srivastava.
+The goal of this platform is to provide fun, simple, and engaging games that anyone can play instantly without downloads.
+</p>
+
+<p>
+This platform focuses on:
+</p>
+
+<ul>
+<li>✔ Easy-to-play casual games</li>
+<li>✔ Fast performance on all devices</li>
+<li>✔ Competitive leaderboard system</li>
+<li>✔ Continuous feature updates</li>
+</ul>
+
+<p>
+AstraVerse Pro is continuously evolving and aims to become a complete gaming ecosystem in the future.
+</p>
+
 </div>
 
-<!-- CONTACT -->
+<!-- ===== CONTACT ===== -->
 <div id="contact" class="section">
 <h2>Contact</h2>
 <p>Email: your@email.com</p>
+<p>Feel free to reach out for feedback or suggestions.</p>
 </div>
 
-<!-- PRIVACY -->
+<!-- ===== PRIVACY ===== -->
 <div id="privacy" class="section">
 <h2>Privacy Policy</h2>
-<p>We use cookies and ads for better experience.</p>
+<p>
+We value your privacy. This website may store basic data like username locally for gameplay.
+We may use cookies and third-party services such as Google AdSense to display ads.
+No sensitive personal data is collected or shared.
+</p>
 </div>
 
-<!-- SOUND -->
-<audio id="clickSound" src="https://www.soundjay.com/buttons/button-3.mp3"></audio>
+<!-- ===== FOOTER ===== -->
+<footer>
+<p>© 2026 AstraVerse Pro | Built by Apoorv Srivastava</p>
+</footer>
 
 <script>
 
@@ -142,29 +200,29 @@ function show(id){
   document.getElementById(id).classList.add('active');
 }
 
-/* USER */
+/* USER SYSTEM */
 function saveUser(){
   let name=document.getElementById("userInput").value;
   localStorage.setItem("user",name);
   document.getElementById("welcome").innerText="Welcome "+name;
 }
 
-/* SOUND */
-function playSound(){
-  document.getElementById("clickSound").play();
-}
-
 /* GAME OPEN */
 function openGame(id){
-  playSound();
   document.getElementById("tic").style.display="none";
   document.getElementById("guess").style.display="none";
-  document.getElementById(id).style.display="block";
+
+  if(id==="tic"){
+    startTic();
+  }
+  if(id==="guess"){
+    startGuess();
+  }
 }
 
 /* LEADERBOARD */
 function updateScore(points){
-  let name=localStorage.getItem("user") || "Guest";
+  let name=localStorage.getItem("user")||"Guest";
   let data=JSON.parse(localStorage.getItem("scores")||"[]");
   data.push({name,points});
   localStorage.setItem("scores",JSON.stringify(data));
@@ -174,68 +232,70 @@ function updateScore(points){
 function showLeaderboard(){
   let data=JSON.parse(localStorage.getItem("scores")||"[]");
   data.sort((a,b)=>b.points-a.points);
-
   let html="";
   data.slice(0,5).forEach(d=>{
     html+=`<li>${d.name} - ${d.points}</li>`;
   });
-
   document.getElementById("leaderboard").innerHTML=html;
 }
-
 showLeaderboard();
 
 /* TIC TAC TOE */
-let turn="X";
-let boardState=[];
-
 function startTic(){
-  let board=document.getElementById("board");
-  board.innerHTML="";
-  boardState=["","","","","","","","",""];
-  turn="X";
+  let div=document.getElementById("tic");
+  div.style.display="block";
+  div.innerHTML="<h3>Tic Tac Toe</h3>";
+
+  let board=["","","","","","","","",""];
+  let turn="X";
 
   for(let i=0;i<9;i++){
-    let b=document.createElement("button");
-    b.className="btn";
-    b.onclick=()=>move(b,i);
-    board.appendChild(b);
+    let btn=document.createElement("button");
+    btn.className="btn";
+    btn.onclick=()=>{
+      if(board[i]==""){
+        board[i]=turn;
+        btn.innerText=turn;
+
+        if(check()){
+          alert(turn+" wins!");
+          updateScore(10);
+        }
+        turn=turn=="X"?"O":"X";
+      }
+    };
+    div.appendChild(btn);
   }
-}
 
-function move(btn,i){
-  if(boardState[i]==""){
-    playSound();
-    boardState[i]=turn;
-    btn.innerText=turn;
-
-    if(checkWin()){
-      alert(turn+" wins!");
-      updateScore(10);
-      return;
-    }
-
-    turn=turn=="X"?"O":"X";
+  function check(){
+    let w=[[0,1,2],[3,4,5],[6,7,8]];
+    return w.some(a=>board[a[0]] && board[a[0]]==board[a[1]] && board[a[1]]==board[a[2]]);
   }
-}
-
-function checkWin(){
-  let w=[[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6]];
-  return w.some(a=>boardState[a[0]] && boardState[a[0]]==boardState[a[1]] && boardState[a[1]]==boardState[a[2]]);
 }
 
 /* GUESS */
-let num=Math.floor(Math.random()*10);
+function startGuess(){
+  let div=document.getElementById("guess");
+  div.style.display="block";
 
-function guess(){
-  let g=document.getElementById("guessInput").value;
+  let num=Math.floor(Math.random()*10);
 
-  if(g==num){
-    document.getElementById("result").innerText="Correct!";
-    updateScore(5);
-    num=Math.floor(Math.random()*10);
-  } else {
-    document.getElementById("result").innerText="Wrong!";
+  div.innerHTML=`
+    <h3>Guess Number</h3>
+    <input id="g">
+    <button class="btn" onclick="playGuess()">Try</button>
+    <p id="res"></p>
+  `;
+
+  window.playGuess=function(){
+    let g=document.getElementById("g").value;
+    if(g==num){
+      document.getElementById("res").innerText="Correct!";
+      updateScore(5);
+      num=Math.floor(Math.random()*10);
+    } else {
+      document.getElementById("res").innerText="Wrong!";
+    }
   }
 }
 
@@ -243,3 +303,7 @@ function guess(){
 
 </body>
 </html>
+
+
+
+  
